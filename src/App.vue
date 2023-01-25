@@ -1,17 +1,26 @@
 <template>
-  <div>
+  <div id="app">
     <Form />
+    <Modal :status="status" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import Form from "./components/Form.vue";
+import Modal from "./components/Modal.vue";
+import { Status } from "./types";
+import type { Ref } from "vue";
 
 export default defineComponent({
   name: "App",
   components: {
     Form,
+    Modal,
+  },
+  setup() {
+    const status: Ref<string> = ref(Status.FILLING_FORM);
+    return { status };
   },
 });
 </script>
