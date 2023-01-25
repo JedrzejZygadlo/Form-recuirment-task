@@ -1,5 +1,5 @@
 <template>
-  <transition v-show="false" name="modal">
+  <transition v-show="true" name="modal">
     <div class="modal">
       <div class="modal--mask" @click="closeModal"></div>
       <div class="modal--content">
@@ -8,6 +8,11 @@
         </div>
         <div class="modal--body">
           <h2>{{ modalText }}</h2>
+          <SvgBase :name="'valid'" :width="24" :height="24">
+            <LoadingIcon v-if="isLoading" />
+            <SuccessIcon v-else-if="isSuccess" />
+            <FailureIcon v-else-if="isFailed" />
+          </SvgBase>
           <button>Continue</button>
         </div>
       </div>
@@ -16,13 +21,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import { Status } from "../types";
 import type { Ref } from "vue";
+import SvgBase from "./SvgBase.vue";
+import { FailureIcon, SuccessIcon, LoadingIcon } from "./svgs";
 
 export default defineComponent({
   name: "Modal",
-  components: {},
+  components: {
+    SvgBase,
+    FailureIcon,
+    SuccessIcon,
+    LoadingIcon,
+  },
   props: {
     status: {
       type: String,
@@ -30,12 +42,17 @@ export default defineComponent({
       required: true,
     },
   },
-  setup() {
+
+  setup(props) {
+    const isLoading = computed(() => props.status === Status.LOADING);
+    const isFailed = computed(() => props.status === Status.FAILED);
+    const isSuccess = computed(() => props.status === Status.SUCCESS);
+
     const modalText: Ref<string> = ref("Loading");
     const closeModal = (e: Event) => {
       e.preventDefault();
     };
-    return { closeModal, modalText };
+    return { closeModal, modalText, isLoading, isFailed, isSuccess };
   },
 });
 </script>

@@ -18,7 +18,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import BasicInput from "./BasicInput.vue";
-import { Label, Placeholder, FormField } from "../types";
+import { Label, Placeholder, FormField, FormFieldSettings } from "../types";
 import type { Ref } from "vue";
 
 export default defineComponent({
@@ -74,9 +74,55 @@ export default defineComponent({
     ]);
     let isSubmitted: Ref<boolean> = ref(false);
 
+    const isRequiredError = (settings: FormFieldSettings, value: string) => {
+      return settings.isRequired && !value.length;
+    };
+
+    const isMinLengthError = (settings: FormFieldSettings, value: string) => {
+      return settings.minLength && value.length < settings.minLength;
+    };
+
+    const isMaxLengthError = (settings: FormFieldSettings, value: string) => {
+      return settings.maxLength && value.length > settings.maxLength;
+    };
+
+    const isEmailError = (settings: FormFieldSettings, value: string) => {
+      //regex in form any@any.any (@ and . are required in correct places, regex is avoid whitespaces and multiple @ signs.)
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const notMatched = !value.match(regex);
+      return settings.type === "email" && notMatched;
+    };
+
+    const validateForm = () => {
+      //For each Field create error stack -> statements order has matter bacuse of priority. I've decided to display only one (always first) error per field.
+      formFields.value.forEach(({ settings, value }, index) => {
+        let errors: string[] = [];
+        if (isRequiredError(settings, value)) {
+          errors.push(`Field ${settings.label} is required`);
+        }
+        if (isMinLengthError(settings, value)) {
+          errors.push(
+            `Field ${settings.label} is to short. Minimum length is ${settings.minLength} characters.`
+          );
+        }
+        if (isMaxLengthError(settings, value)) {
+          errors.push(
+            `Field ${settings.label} is to long. Maximum length is ${settings.maxLength} characters.`
+          );
+        }
+        if (isEmailError(settings, value)) {
+          errors.push(
+            `Field ${settings.label} is in wrong format. Please provide correct format f.e: name@domain.com`
+          );
+        }
+        formFields.value[index].errors = [...errors];
+      });
+    };
+
     const submitForm = (e: Event) => {
       e.preventDefault();
       isSubmitted.value = true;
+      validateForm();
     };
     return { formFields, isSubmitted, submitForm };
   },
