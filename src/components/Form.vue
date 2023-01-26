@@ -1,5 +1,5 @@
 <template>
-  <div class="form-container">
+  <div class="form-content-container">
     <form>
       <BasicInput
         v-for="formField in formFields"
@@ -10,7 +10,9 @@
         :errors="formField.errors"
       >
       </BasicInput>
-      <button type="submit" @click="submitForm">Submit</button>
+      <button type="submit" @click="submitForm" class="submit-button">
+        Send
+      </button>
     </form>
   </div>
 </template>
@@ -20,12 +22,14 @@ import { defineComponent, ref } from "vue";
 import BasicInput from "./BasicInput.vue";
 import { Label, Placeholder, FormField, FormFieldSettings } from "../types";
 import type { Ref } from "vue";
+import { Status } from "../types";
 
 export default defineComponent({
   name: "Form",
   components: { BasicInput },
 
-  setup() {
+  setup(props, context) {
+    let isSomeError = false;
     let formFields: Ref<FormField[]> = ref([
       {
         value: "",
@@ -53,10 +57,11 @@ export default defineComponent({
         value: "",
         errors: [],
         settings: {
-          type: "text",
+          type: "textarea",
           label: Label.SUBJECT,
           placeholder: Placeholder.SUBJECT,
           maxLength: 100,
+          rows: 2,
           isRequired: false,
         },
       },
@@ -64,10 +69,11 @@ export default defineComponent({
         value: "",
         errors: [],
         settings: {
-          type: "text",
+          type: "textarea",
           label: Label.MESSAGE,
           placeholder: Placeholder.MESSAGE,
           maxLength: 500,
+          rows: 4,
           isRequired: true,
         },
       },
@@ -94,6 +100,7 @@ export default defineComponent({
     };
 
     const validateForm = () => {
+      setSomeError(false);
       //For each Field create error stack -> statements order has matter bacuse of priority. I've decided to display only one (always first) error per field.
       formFields.value.forEach(({ settings, value }, index) => {
         let errors: string[] = [];
@@ -115,18 +122,51 @@ export default defineComponent({
             `Field ${settings.label} is in wrong format. Please provide correct format f.e: name@domain.com`
           );
         }
+        if (errors.length) {
+          setSomeError(true);
+        }
         formFields.value[index].errors = [...errors];
       });
+    };
+
+    const setSomeError = (isError: boolean) => (isSomeError = isError);
+
+    const setIsOpened = (newStatus: string) => {
+      console.log("inside2");
+      console.log("newStatus", newStatus);
+      context.emit("status", newStatus);
     };
 
     const submitForm = (e: Event) => {
       e.preventDefault();
       isSubmitted.value = true;
       validateForm();
+      if (!isSomeError) {
+        setIsOpened(Status.LOADING);
+      }
+      // TODO: SEND REQUEST
+      // IF SUCCESS - change status + reset values
+      // IF FAILED - change status
     };
-    return { formFields, isSubmitted, submitForm };
+    return { formFields, isSubmitted, submitForm, setSomeError, isSomeError };
   },
 });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+@import "../styles/variables.scss";
+.form-content-container {
+  margin: $spacing-4 0 $spacing-8 0;
+}
+.submit-button {
+  background-color: $midBlue;
+  font-size: $sm;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: none;
+  padding: $spacing-3 $spacing-2;
+  width: 100%;
+  margin-top: $spacing-3;
+  color: $darkGray;
+}
+</style>

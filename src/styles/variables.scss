@@ -1,0 +1,19 @@
+@import "./colors.scss";
+@import "./fontSize.scss";
+@import "./spacing.scss";
+
+$maxWidth: 800px;
+$minWidth: 500px;
+
+@mixin center-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin column-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}

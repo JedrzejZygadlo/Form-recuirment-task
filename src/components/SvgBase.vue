@@ -3,7 +3,7 @@
     xmlns="http://www.w3.org/2000/svg"
     :width="width + 'px'"
     :height="height + 'px'"
-    :viewBox="`0 0 512 512`"
+    :viewBox="viewBox"
     :aria-label="name"
     role="presentation"
     :class="`${name}-svg`"
@@ -32,6 +32,11 @@ export default defineComponent({
       type: String,
       default: "icon",
       required: true,
+    },
+    viewBox: {
+      type: String,
+      default: "0 0 512 512",
+      required: false,
     },
   },
 });

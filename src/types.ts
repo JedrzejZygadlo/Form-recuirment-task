@@ -8,7 +8,7 @@ export enum Label {
 export enum Placeholder {
   NAME = "Type your name...",
   EMAIL = "Type your email adress...",
-  SUBJECT = "Type a subject",
+  SUBJECT = "Type a subject...",
   MESSAGE = "Type message here...",
 }
 
@@ -32,6 +32,7 @@ export interface FormFieldSettings {
   isRequired: boolean;
   minLength?: number;
   maxLength?: number;
+  rows?: number;
 }
 
 export interface IputProps {

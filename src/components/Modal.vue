@@ -1,5 +1,5 @@
 <template>
-  <transition v-show="true" name="modal">
+  <transition v-show="shouldShowModal" name="modal">
     <div class="modal">
       <div class="modal--mask" @click="closeModal"></div>
       <div class="modal--content">
@@ -48,11 +48,21 @@ export default defineComponent({
     const isFailed = computed(() => props.status === Status.FAILED);
     const isSuccess = computed(() => props.status === Status.SUCCESS);
 
+    const shouldShowModal = computed(
+      () => isLoading.value || isFailed.value || isSuccess.value
+    );
     const modalText: Ref<string> = ref("Loading");
     const closeModal = (e: Event) => {
       e.preventDefault();
     };
-    return { closeModal, modalText, isLoading, isFailed, isSuccess };
+    return {
+      closeModal,
+      modalText,
+      isLoading,
+      isFailed,
+      isSuccess,
+      shouldShowModal,
+    };
   },
 });
 </script>
