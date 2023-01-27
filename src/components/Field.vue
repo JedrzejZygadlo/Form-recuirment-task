@@ -40,7 +40,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, computed } from "vue";
-import { FormFieldSettings, IputProps } from "../types";
+import { FormFieldSettings, IputProps, FieldType } from "../types";
 import BaseSvg from "./BaseSvg.vue";
 import { ErrorIcon, ValidIcon } from "./svgs";
 
@@ -69,16 +69,20 @@ export default defineComponent({
   },
   setup(props: IputProps) {
     const isValid = computed(() => props.isSubmitted && !props.errors.length);
+    // First and second field will be input
     const isInput = computed(
       () =>
-        props.formSettings.type === "text" ||
-        props.formSettings.type === "email"
+        props.formSettings.type === FieldType.TEXT ||
+        props.formSettings.type === FieldType.EMAIL
     );
-    const isTextArea = computed(() => props.formSettings.type === "textarea");
+    //For 3rd and 4rd field I will display textarea because number of maximum characters is quite big so its should be user friendly
+    const isTextArea = computed(
+      () => props.formSettings.type === FieldType.TEXTAREA
+    );
     return { isValid, isInput, isTextArea };
   },
   methods: {
-    handleInput(e: Event) {
+    handleInput(e: Event): void {
       const target = e.target as HTMLInputElement;
       this.$emit("update:modelValue", target.value);
     },
@@ -94,7 +98,7 @@ export default defineComponent({
   .form-field--label {
     font-size: $xs;
     font-weight: 700;
-    margin: spacing(1) 0;
+    margin: $spacing-1 0;
   }
   .form-field--input-wrapper {
     width: 100%;
@@ -114,7 +118,7 @@ export default defineComponent({
   .form-control {
     width: 100%;
     box-sizing: border-box;
-    padding: spacing(2);
+    padding: $spacing-2;
     border: 2px solid $lightGray;
     color: $darkGray;
     font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -132,7 +136,7 @@ export default defineComponent({
   .error-message {
     font-size: $xxxs;
     color: $red;
-    margin: spacing(1) 0 0 0;
+    margin: $spacing-1 0 0 0;
     font-weight: 700;
   }
 }

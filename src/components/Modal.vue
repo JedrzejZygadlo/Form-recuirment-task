@@ -62,7 +62,8 @@ export default defineComponent({
     },
   },
 
-  setup(props, context) {
+  setup(props: { status: string }, context) {
+    //Modal contain 3 states, based of if diffrent elements/icons/classes are displayed
     const isLoading = computed(() => props.status === Status.LOADING);
     const isFailed = computed(() => props.status === Status.FAILED);
     const isSuccess = computed(() => props.status === Status.SUCCESS);
@@ -90,7 +91,7 @@ export default defineComponent({
     const shouldShowModal = computed(
       () => isLoading.value || isFailed.value || isSuccess.value
     );
-    const closeModal = (e: Event) => {
+    const closeModal = (e: Event): void => {
       e.preventDefault();
       context.emit("status", Status.FILLING_FORM);
     };

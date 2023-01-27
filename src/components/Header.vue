@@ -31,7 +31,7 @@ export default defineComponent({
 .form-header {
   .form-header-inner-wrapper {
     background-color: $lightBlue;
-    padding: spacing(2) spacing(4);
+    padding: $spacing-2 $spacing-4;
   }
   .form-header--text {
     margin: 0;

@@ -28,7 +28,7 @@ export default defineComponent({
   },
   setup() {
     let status: Ref<string> = ref(Status.FILLING_FORM);
-    const changeStatus = (newStatus: string) => {
+    const changeStatus = (newStatus: string): void => {
       status.value = newStatus;
     };
     return { status, changeStatus };

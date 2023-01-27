@@ -25,6 +25,12 @@ export enum StatusMessage {
   FAILED = "Something went wrong, please try again later",
 }
 
+export enum FieldType {
+  TEXT = "text",
+  TEXTAREA = "textarea",
+  EMAIL = "email",
+}
+
 export interface FormField {
   value: string;
   errors: string[];

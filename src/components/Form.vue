@@ -20,7 +20,13 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import Field from "./Field.vue";
-import { Label, Placeholder, FormField, FormFieldSettings } from "../types";
+import {
+  Label,
+  Placeholder,
+  FormField,
+  FormFieldSettings,
+  FieldType,
+} from "../types";
 import type { Ref } from "vue";
 import { Status, PayloadType } from "../types";
 import apiClient from "../service";
@@ -36,7 +42,7 @@ export default defineComponent({
         value: "",
         errors: [],
         settings: {
-          type: "text",
+          type: FieldType.TEXT,
           label: Label.NAME,
           placeholder: Placeholder.NAME,
           minLength: 5,
@@ -48,7 +54,7 @@ export default defineComponent({
         value: "",
         errors: [],
         settings: {
-          type: "email",
+          type: FieldType.EMAIL,
           label: Label.EMAIL,
           placeholder: Placeholder.EMAIL,
           isRequired: true,
@@ -58,7 +64,7 @@ export default defineComponent({
         value: "",
         errors: [],
         settings: {
-          type: "textarea",
+          type: FieldType.TEXTAREA,
           label: Label.SUBJECT,
           placeholder: Placeholder.SUBJECT,
           maxLength: 100,
@@ -70,7 +76,7 @@ export default defineComponent({
         value: "",
         errors: [],
         settings: {
-          type: "textarea",
+          type: FieldType.TEXTAREA,
           label: Label.MESSAGE,
           placeholder: Placeholder.MESSAGE,
           maxLength: 500,
@@ -81,22 +87,27 @@ export default defineComponent({
     ]);
     let isSubmitted: Ref<boolean> = ref(false);
 
-    const isRequiredError = (settings: FormFieldSettings, value: string) => {
+    const isRequiredError = (
+      settings: FormFieldSettings,
+      value: string
+    ): boolean => {
       return settings.isRequired && !value.replace("/\n/g", "").length;
     };
 
-    const isMinLengthError = (settings: FormFieldSettings, value: string) => {
-      return (
-        settings.minLength &&
-        value.replace("/\n/g", "").length < settings.minLength
-      );
+    const isMinLengthError = (
+      settings: FormFieldSettings,
+      value: string
+    ): boolean => {
+      if (!settings.minLength) return false;
+      return value.replace("/\n/g", "").length < settings.minLength;
     };
 
-    const isMaxLengthError = (settings: FormFieldSettings, value: string) => {
-      return (
-        settings.maxLength &&
-        value.replace("/\n/g", "").length > settings.maxLength
-      );
+    const isMaxLengthError = (
+      settings: FormFieldSettings,
+      value: string
+    ): boolean => {
+      if (!settings.maxLength) return false;
+      return value.replace("/\n/g", "").length > settings.maxLength;
     };
 
     const isEmailError = (
@@ -106,7 +117,7 @@ export default defineComponent({
       //regex in form any@any.any (@ and . are required in correct places, regex is avoid whitespaces and multiple @ signs.)
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const notMatched = !value.match(regex);
-      return settings.type === "email" && notMatched;
+      return settings.type === FieldType.EMAIL && notMatched;
     };
 
     const validateForm = (): void => {
@@ -122,6 +133,7 @@ export default defineComponent({
             `Field ${settings.label} is to short. Minimum length is ${settings.minLength} characters.`
           );
         }
+        //isMaxLengthError is only for double check becuase maxlenght attribute shouldnt let user to write more characters
         if (isMaxLengthError(settings, value)) {
           errors.push(
             `Field ${settings.label} is to long. Maximum length is ${settings.maxLength} characters.`
@@ -139,7 +151,10 @@ export default defineComponent({
       });
     };
 
-    const setSomeError = (isError: boolean) => (isSomeError.value = isError);
+    const setSomeError = (isError: boolean): void => {
+      isSomeError.value = isError;
+      return;
+    };
 
     const changeStatus = (newStatus: string): void => {
       context.emit("status", newStatus);
@@ -151,7 +166,7 @@ export default defineComponent({
       validateForm();
       if (isSomeError.value) return;
 
-      const data = getFormDataToSend();
+      const data: PayloadType = getFormDataToSend();
       changeStatus(Status.LOADING);
       sendMessage(data)
         .then(() => {
