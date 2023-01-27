@@ -47,3 +47,22 @@ export interface IputProps {
   isSubmitted: boolean;
   errors: string[];
 }
+
+export interface Payload {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export type PayloadType = Payload | Record<string, never>;
+
+export interface Response {
+  createdAt: string;
+  name: string;
+  avatar: string;
+  id: number;
+  email: string;
+  subject: string;
+  message: string;
+}

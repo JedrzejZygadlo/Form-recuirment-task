@@ -22,7 +22,8 @@ import { defineComponent, ref } from "vue";
 import Field from "./Field.vue";
 import { Label, Placeholder, FormField, FormFieldSettings } from "../types";
 import type { Ref } from "vue";
-import { Status } from "../types";
+import { Status, PayloadType } from "../types";
+import apiClient from "../service";
 
 export default defineComponent({
   name: "Form",
@@ -92,14 +93,17 @@ export default defineComponent({
       return settings.maxLength && value.length > settings.maxLength;
     };
 
-    const isEmailError = (settings: FormFieldSettings, value: string) => {
+    const isEmailError = (
+      settings: FormFieldSettings,
+      value: string
+    ): boolean => {
       //regex in form any@any.any (@ and . are required in correct places, regex is avoid whitespaces and multiple @ signs.)
       const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const notMatched = !value.match(regex);
       return settings.type === "email" && notMatched;
     };
 
-    const validateForm = () => {
+    const validateForm = (): void => {
       setSomeError(false);
       //For each Field create error stack -> statements order has matter bacuse of priority. I've decided to display only one (always first) error per field.
       formFields.value.forEach(({ settings, value }, index) => {
@@ -131,24 +135,53 @@ export default defineComponent({
 
     const setSomeError = (isError: boolean) => (isSomeError = isError);
 
-    const setIsOpened = (newStatus: string) => {
-      console.log("inside2");
-      console.log("newStatus", newStatus);
+    const changeStatus = (newStatus: string): void => {
       context.emit("status", newStatus);
     };
 
-    const submitForm = (e: Event) => {
+    const submitForm = (e: Event): void => {
       e.preventDefault();
       isSubmitted.value = true;
       validateForm();
-      if (!isSomeError) {
-        setIsOpened(Status.LOADING);
-      }
-      // TODO: SEND REQUEST
-      // IF SUCCESS - change status + reset values
-      // IF FAILED - change status
+      if (isSomeError) return;
+
+      const data = getFormDataToSend();
+      changeStatus(Status.LOADING);
+      sendMessage(data)
+        .then(() => {
+          changeStatus(Status.SUCCESS);
+        })
+        .catch(() => {
+          changeStatus(Status.FAILED);
+        });
     };
-    return { formFields, isSubmitted, submitForm, setSomeError, isSomeError };
+
+    const getFormDataToSend = (): PayloadType => {
+      return formFields.value.reduce((acc, curr) => {
+        return {
+          ...acc,
+          ...{
+            [curr.settings.label.toLowerCase()]: curr.value.replace(
+              "/\n/g",
+              " "
+            ),
+          },
+        };
+      }, {});
+    };
+
+    const sendMessage = (data: PayloadType): Promise<PayloadType> => {
+      return apiClient.post("/message", data);
+    };
+
+    return {
+      formFields,
+      isSubmitted,
+      submitForm,
+      setSomeError,
+      isSomeError,
+      getFormDataToSend,
+    };
   },
 });
 </script>
