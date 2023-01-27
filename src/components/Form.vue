@@ -30,7 +30,7 @@ export default defineComponent({
   components: { Field },
 
   setup(props, context) {
-    let isSomeError = false;
+    let isSomeError = ref(false);
     let formFields: Ref<FormField[]> = ref([
       {
         value: "",
@@ -82,15 +82,21 @@ export default defineComponent({
     let isSubmitted: Ref<boolean> = ref(false);
 
     const isRequiredError = (settings: FormFieldSettings, value: string) => {
-      return settings.isRequired && !value.length;
+      return settings.isRequired && !value.replace("/\n/g", "").length;
     };
 
     const isMinLengthError = (settings: FormFieldSettings, value: string) => {
-      return settings.minLength && value.length < settings.minLength;
+      return (
+        settings.minLength &&
+        value.replace("/\n/g", "").length < settings.minLength
+      );
     };
 
     const isMaxLengthError = (settings: FormFieldSettings, value: string) => {
-      return settings.maxLength && value.length > settings.maxLength;
+      return (
+        settings.maxLength &&
+        value.replace("/\n/g", "").length > settings.maxLength
+      );
     };
 
     const isEmailError = (
@@ -133,7 +139,7 @@ export default defineComponent({
       });
     };
 
-    const setSomeError = (isError: boolean) => (isSomeError = isError);
+    const setSomeError = (isError: boolean) => (isSomeError.value = isError);
 
     const changeStatus = (newStatus: string): void => {
       context.emit("status", newStatus);
@@ -143,12 +149,13 @@ export default defineComponent({
       e.preventDefault();
       isSubmitted.value = true;
       validateForm();
-      if (isSomeError) return;
+      if (isSomeError.value) return;
 
       const data = getFormDataToSend();
       changeStatus(Status.LOADING);
       sendMessage(data)
         .then(() => {
+          formFields.value.forEach((formField) => (formField.value = ""));
           changeStatus(Status.SUCCESS);
         })
         .catch(() => {
@@ -181,6 +188,13 @@ export default defineComponent({
       setSomeError,
       isSomeError,
       getFormDataToSend,
+      isRequiredError,
+      isMinLengthError,
+      isMaxLengthError,
+      isEmailError,
+      validateForm,
+      changeStatus,
+      sendMessage,
     };
   },
 });
