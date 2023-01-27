@@ -5,7 +5,7 @@
       <Header />
       <Form @status="changeStatus" />
     </div>
-    <Modal :status="status" />
+    <Modal @status="changeStatus" :status="status" />
   </div>
 </template>
 
@@ -37,10 +37,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import "./styles/colors.scss";
 @import "./styles/variables.scss";
-@import "./styles/fontSize.scss";
-@import "./styles/spacing.scss";
 
 body {
   margin: 0;

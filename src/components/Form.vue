@@ -1,7 +1,7 @@
 <template>
   <div class="form-content-container">
     <form>
-      <BasicInput
+      <Field
         v-for="formField in formFields"
         :key="formField.settings.label"
         v-model="formField.value"
@@ -9,7 +9,7 @@
         :isSubmitted="isSubmitted"
         :errors="formField.errors"
       >
-      </BasicInput>
+      </Field>
       <button type="submit" @click="submitForm" class="submit-button">
         Send
       </button>
@@ -19,14 +19,14 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import BasicInput from "./BasicInput.vue";
+import Field from "./Field.vue";
 import { Label, Placeholder, FormField, FormFieldSettings } from "../types";
 import type { Ref } from "vue";
 import { Status } from "../types";
 
 export default defineComponent({
   name: "Form",
-  components: { BasicInput },
+  components: { Field },
 
   setup(props, context) {
     let isSomeError = false;

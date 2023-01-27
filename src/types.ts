@@ -19,6 +19,12 @@ export enum Status {
   FAILED = "failed",
 }
 
+export enum StatusMessage {
+  LOADING = "We send your message. Thank you for your patience",
+  SUCCESS = "Your message has been successfully sent",
+  FAILED = "Something went wrong, please try again later",
+}
+
 export interface FormField {
   value: string;
   errors: string[];

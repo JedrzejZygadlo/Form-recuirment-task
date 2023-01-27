@@ -5,6 +5,7 @@ import SuccessIcon from "./success.vue";
 import ValidIcon from "./valid.vue";
 import Logo from "./logo.vue";
 import EntryIcon from "./entry.vue";
+import CloseIcon from "./close.vue";
 
 export {
   ErrorIcon,
@@ -14,4 +15,5 @@ export {
   ValidIcon,
   Logo,
   EntryIcon,
+  CloseIcon,
 };

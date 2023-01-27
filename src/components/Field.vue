@@ -1,26 +1,39 @@
 <template>
-  <div class="form-basic-input--container">
-    <label class="form-basic-input--label">{{ formSettings.label }} </label>
-    <input
-      v-if="isInput"
-      :type="formSettings.type"
-      :value="modelValue"
-      @input="handleInput"
-      class="form-control"
-      :class="[{ 'is-valid': isValid }, { 'is-error': errors.length }]"
-      :placeholder="formSettings.placeholder"
-      :maxLength="formSettings.maxLength ? formSettings.maxLength : null"
-    />
-    <textarea
-      v-else-if="isTextArea"
-      :value="modelValue"
-      @input="handleInput"
-      class="form-control"
-      :class="[{ 'is-valid': isValid }, { 'is-error': errors.length }]"
-      :placeholder="formSettings.placeholder"
-      :maxLength="formSettings.maxLength ? formSettings.maxLength : null"
-      :rows="formSettings.rows"
-    />
+  <div class="form-field--container">
+    <label class="form-field--label">{{ formSettings.label }} </label>
+    <div class="form-field--input-wrapper">
+      <input
+        v-if="isInput"
+        :type="formSettings.type"
+        :value="modelValue"
+        @input="handleInput"
+        class="form-control"
+        :class="[{ 'is-valid': isValid }, { 'is-error': errors.length }]"
+        :placeholder="formSettings.placeholder"
+        :maxLength="formSettings.maxLength ? formSettings.maxLength : null"
+      />
+      <textarea
+        v-else-if="isTextArea"
+        :value="modelValue"
+        @input="handleInput"
+        class="form-control"
+        :class="[{ 'is-valid': isValid }, { 'is-error': errors.length }]"
+        :placeholder="formSettings.placeholder"
+        :maxLength="formSettings.maxLength ? formSettings.maxLength : null"
+        :rows="formSettings.rows"
+      />
+      <BaseSvg v-if="isValid" :name="'valid'" :width="16" :height="16">
+        <ValidIcon />
+      </BaseSvg>
+      <BaseSvg
+        v-else-if="errors.length"
+        :name="'error'"
+        :width="16"
+        :height="16"
+      >
+        <ErrorIcon />
+      </BaseSvg>
+    </div>
     <p v-show="errors.length" class="error-message">{{ errors[0] }}</p>
   </div>
 </template>
@@ -28,8 +41,12 @@
 <script lang="ts">
 import { defineComponent, PropType, computed } from "vue";
 import { FormFieldSettings, IputProps } from "../types";
+import BaseSvg from "./BaseSvg.vue";
+import { ErrorIcon, ValidIcon } from "./svgs";
+
 export default defineComponent({
-  name: "BasicInput",
+  name: "Field",
+  components: { BaseSvg, ErrorIcon, ValidIcon },
   props: {
     formSettings: {
       type: Object as PropType<FormFieldSettings>,
@@ -71,13 +88,28 @@ export default defineComponent({
 
 <style scoped lang="scss">
 @import "../styles/variables.scss";
-.form-basic-input--container {
+.form-field--container {
   @include column-left;
   margin: $spacing-3 0;
-  .form-basic-input--label {
+  .form-field--label {
     font-size: $xs;
     font-weight: 700;
     margin: spacing(1) 0;
+  }
+  .form-field--input-wrapper {
+    width: 100%;
+    position: relative;
+    textarea {
+      resize: none;
+    }
+  }
+  .valid-svg {
+    @include input-icon-position;
+    fill: $green;
+  }
+  .error-svg {
+    @include input-icon-position;
+    fill: $red;
   }
   .form-control {
     width: 100%;
